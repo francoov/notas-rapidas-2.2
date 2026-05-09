@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
 
 let allBlocks = []; // Array de todos los bloques con sus notas
 let filteredBlocks = []; // Array de bloques filtrados según los filtros activos

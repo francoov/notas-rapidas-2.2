@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
 
 let persons = [];
 let tags = [];

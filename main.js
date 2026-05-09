@@ -8,6 +8,7 @@ const iconPath = path.join(__dirname, 'assets', 'icon.ico');
 let mainWindow;
 let noteWindows = new Map(); // Map para almacenar ventanas de notas por ID
 let kanbanWindow = null;
+let dataStore = null;
 
 // Obtener ventana de nota por id (el id puede llegar como string desde la URL o como number desde la lista)
 function getNoteWindowById(noteId) {
@@ -106,6 +107,14 @@ function createNoteWindow(noteId = null, referenceWindow = null) {
 }
 
 app.whenReady().then(() => {
+  try {
+    const { openStore } = require('./db/open');
+    dataStore = openStore(app.getPath('userData'));
+    console.log('[storage] SQLite backend activo:', dataStore.dbPath);
+  } catch (err) {
+    dataStore = null;
+    console.warn('[storage] SQLite no disponible, usando localStorage. Motivo:', err.message);
+  }
   createMainWindow();
 
   app.on('activate', () => {
@@ -115,6 +124,12 @@ app.whenReady().then(() => {
   });
 });
 
+app.on('before-quit', () => {
+  if (dataStore) {
+    dataStore.close();
+  }
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -122,6 +137,59 @@ app.on('window-all-closed', () => {
 });
 
 // IPC Handlers
+ipcMain.on('storage-get-sync', (event, key) => {
+  try {
+    if (!dataStore || !dataStore.isSqliteKey(key)) {
+      event.returnValue = null;
+      return;
+    }
+    event.returnValue = dataStore.getValue(key);
+  } catch (err) {
+    event.returnValue = null;
+  }
+});
+
+ipcMain.on('storage-set-sync', (event, payload) => {
+  try {
+    const { key, value } = payload || {};
+    if (!dataStore || !dataStore.isSqliteKey(key)) {
+      event.returnValue = false;
+      return;
+    }
+    dataStore.setValue(key, value);
+    event.returnValue = true;
+  } catch (err) {
+    event.returnValue = false;
+  }
+});
+
+ipcMain.on('storage-remove-sync', (event, key) => {
+  try {
+    if (!dataStore || !dataStore.isSqliteKey(key)) {
+      event.returnValue = false;
+      return;
+    }
+    dataStore.removeValue(key);
+    event.returnValue = true;
+  } catch (err) {
+    event.returnValue = false;
+  }
+});
+
+ipcMain.handle('storage-backend', () => {
+  return {
+    type: dataStore ? 'sqlite' : 'localStorage',
+    dbPath: dataStore ? dataStore.dbPath : null
+  };
+});
+
+ipcMain.on('storage-backend-sync', (event) => {
+  event.returnValue = {
+    type: dataStore ? 'sqlite' : 'localStorage',
+    dbPath: dataStore ? dataStore.dbPath : null
+  };
+});
+
 ipcMain.on('create-note', (event) => {
   // Obtener la ventana que envió el mensaje para desplazar la nueva nota
   const senderWindow = event.sender ? BrowserWindow.fromWebContents(event.sender) : null;

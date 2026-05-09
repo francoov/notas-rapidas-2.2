@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
 
 let noteId = null;
 let noteData = {
