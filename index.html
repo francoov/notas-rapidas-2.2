@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas Rápidas 2</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <button id="newNoteBtn" class="icon-btn" title="Nueva nota"><i data-lucide="plus"></i></button>
+            <h1>Notas rápidas</h1>
+            <div class="header-actions">
+                <div class="menu-container">
+                    <button id="optionsBtn" class="icon-btn" title="Opciones"><i data-lucide="more-vertical"></i></button>
+                    <div id="optionsMenu" class="options-menu">
+                        <button id="kanbanMenuBtn" class="menu-item">
+                            <i data-lucide="layout-grid"></i>
+                            <span>Tablero Kanban</span>
+                        </button>
+                        <button id="closedNotesMenuBtn" class="menu-item">
+                            <i data-lucide="archive"></i>
+                            <span>Notas cerradas</span>
+                        </button>
+                        <button id="settingsMenuBtn" class="menu-item">
+                            <i data-lucide="settings"></i>
+                            <span>Configuración</span>
+                        </button>
+                        <button id="exportDataMenuBtn" class="menu-item">
+                            <i data-lucide="download"></i>
+                            <span>Exportar datos</span>
+                        </button>
+                        <button id="importDataMenuBtn" class="menu-item">
+                            <i data-lucide="upload"></i>
+                            <span>Importar datos</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
+            <span class="search-icon"><i data-lucide="search"></i></span>
+        </div>
+
+        <div class="notes-list" id="notesList">
+            <!-- Las notas se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Eliminar nota</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar esta nota?</p>
+                <p class="modal-warning">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCancelBtn" class="modal-btn modal-btn-secondary">Cancelar</button>
+                <button id="modalConfirmBtn" class="modal-btn modal-btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de mensaje (exportar/importar, etc.) -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="messageModalTitle">Mensaje</h3>
+            </div>
+            <div class="modal-body">
+                <p id="messageModalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="messageModalOkBtn" class="modal-btn modal-btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación (importar datos) -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmModalTitle">Confirmar</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmModalCancelBtn" class="modal-btn modal-btn-secondary">Cancelar</button>
+                <button id="confirmModalOkBtn" class="modal-btn modal-btn-primary">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main-renderer.js"></script>
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

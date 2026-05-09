@@ -1,0 +1,1549 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #333333;
+    color: #dddddd;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.kanban-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #333333;
+}
+
+.kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: #2E2E2E;
+    border-bottom: 1px solid #3E3E3E;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kanban-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.kanban-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #2A2A2A;
+    border-bottom: 1px solid #3E3E3E;
+    flex-wrap: wrap;
+}
+
+.kanban-filters.hidden {
+    display: none;
+}
+
+.toggle-filters-btn {
+    color: #AAAAAA;
+}
+
+.toggle-filters-btn:hover {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+.toggle-filters-btn.active {
+    color: #86d135;
+}
+
+.toggle-filters-btn.active:hover {
+    background: rgba(134, 209, 53, 0.1);
+}
+
+.toggle-filters-btn i,
+.toggle-filters-btn svg {
+    color: inherit;
+    stroke: currentColor;
+}
+
+.toggle-done-column-btn {
+    color: #AAAAAA;
+}
+
+.toggle-done-column-btn:hover {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+.toggle-done-column-btn i,
+.toggle-done-column-btn svg {
+    color: inherit;
+    stroke: currentColor;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #CCCCCC;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.filter-label i,
+.filter-label svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+    color: #888888;
+    flex-shrink: 0;
+}
+
+.filter-select {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: #FFFFFF;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 120px;
+    max-width: 150px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.filter-select:hover {
+    background: #454545;
+    border-color: #5E5E5E;
+}
+
+.filter-select:focus {
+    outline: none;
+    background: #454545;
+    border-color: #86d135;
+}
+
+.filter-select option {
+    background: #2E2E2E;
+    color: #FFFFFF;
+}
+
+.filter-clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid #4E4E4E;
+    border-radius: 4px;
+    padding: 5px 10px;
+    color: #AAAAAA;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.filter-clear-btn:hover {
+    background: #3E3E3E;
+    border-color: #5E5E5E;
+    color: #CCCCCC;
+}
+
+.filter-clear-btn i,
+.filter-clear-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+    color: #dddddd;
+}
+
+.icon-btn:hover {
+    background: #3E3E3E;
+}
+
+.icon-btn i,
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.5;
+}
+
+.notes-list-btn {
+    color: #86d135;
+}
+
+.notes-list-btn:hover {
+    background: rgba(134, 209, 53, 0.1);
+}
+
+.notes-list-btn i,
+.notes-list-btn svg {
+    color: #86d135;
+    stroke: #86d135;
+    stroke-width: 2;
+}
+
+.refresh-btn {
+    color: #dddddd;
+}
+
+.refresh-btn:hover {
+    background: #3E3E3E;
+    color: #ffffff;
+}
+
+.refresh-btn i,
+.refresh-btn svg {
+    color: #dddddd;
+    stroke: #dddddd;
+    transition: transform 0.3s ease;
+}
+
+.refresh-btn:hover i,
+.refresh-btn:hover svg {
+    color: #ffffff;
+    stroke: #ffffff;
+}
+
+/* Animación de carga para el botón de refresh */
+.refresh-btn i.refreshing,
+.refresh-btn svg.refreshing {
+    animation: spin-refresh 0.5s linear;
+}
+
+@keyframes spin-refresh {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Métricas por persona (dona + nombre) */
+.person-metrics {
+    display: flex;
+    gap: 12px;
+    padding: 10px 24px;
+    border-top: 1px solid #3E3E3E;
+    border-bottom: 1px solid #3E3E3E;
+    background: #2A2A2A;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.person-metrics::-webkit-scrollbar {
+    height: 4px;
+}
+
+.person-metrics::-webkit-scrollbar-track {
+    background: #2E2E2E;
+}
+
+.person-metrics::-webkit-scrollbar-thumb {
+    background: #4E4E4E;
+    border-radius: 2px;
+}
+
+.person-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 52px;
+    flex-shrink: 0;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.person-metric-item:hover {
+    background: #3E3E3E;
+}
+
+.person-metric-item.selected {
+    background: rgba(134, 209, 53, 0.15);
+}
+
+.person-metric-item.selected:hover {
+    background: rgba(134, 209, 53, 0.25);
+}
+
+.person-metric-chart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.person-metric-chart-svg {
+    display: block;
+}
+
+.person-metric-name {
+    font-size: 10px;
+    color: #AAAAAA;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+    font-weight: 500;
+}
+
+.person-metric-item:hover .person-metric-name,
+.person-metric-item.selected .person-metric-name {
+    color: #CCCCCC;
+}
+
+/* Tooltip personalizado para donas de personas (a la derecha) */
+.person-metric-tooltip {
+    position: fixed;
+    z-index: 1100;
+    padding: 10px 14px;
+    background: #252525;
+    border: 1px solid #4E4E4E;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+    font-size: 13px;
+    color: #E0E0E0;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.12s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.12s cubic-bezier(0.22, 1, 0.36, 1), transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate(6px, -50%) scale(0.98);
+    white-space: nowrap;
+}
+
+.person-metric-tooltip::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    margin-top: -6px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 7px solid #252525;
+    opacity: 0;
+    transition: opacity 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.person-metric-tooltip::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    margin-top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 8px solid #4E4E4E;
+    opacity: 0;
+    transition: opacity 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.person-metric-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%) scale(1);
+}
+
+.person-metric-tooltip.show::before,
+.person-metric-tooltip.show::after {
+    opacity: 1;
+}
+
+.person-metric-tooltip-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.person-metric-tooltip-line:not(:last-child) {
+    margin-bottom: 4px;
+}
+
+.person-metric-tooltip-label {
+    color: #AAAAAA;
+    font-weight: 500;
+}
+
+.person-metric-tooltip-value {
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.kanban-board {
+    display: flex;
+    flex: 1;
+    gap: 16px;
+    padding: 24px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: #2E2E2E;
+    border-radius: 8px;
+    border: 1px solid #3E3E3E;
+    overflow: hidden;
+    transition: width 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+}
+
+/* Columna Hecho oculta: solo se muestra una franja con el botón para volver a mostrarla */
+.kanban-column.hidden {
+    flex: 0;
+    min-width: 48px;
+    max-width: 48px;
+}
+.kanban-column.hidden .column-content {
+    display: none;
+}
+.kanban-column.hidden .column-header-left,
+.kanban-column.hidden .column-sort-btn {
+    display: none;
+}
+.kanban-column.hidden .column-header {
+    justify-content: center;
+    padding: 8px;
+}
+.kanban-column.hidden .toggle-done-column-btn {
+    margin: 0;
+}
+
+/* Menú contextual - Estilos del handle-menu */
+.handle-menu {
+    position: fixed;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    min-width: auto;
+    z-index: 10000;
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.handle-menu.show {
+    display: flex !important;
+}
+
+.menu-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: space-between;
+}
+
+.menu-nav-btn {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 3px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+    outline: none;
+}
+
+.menu-nav-btn:hover {
+    background: #4E4E4E;
+}
+
+.menu-nav-btn:active {
+    background: #5E5E5E;
+}
+
+.menu-nav-btn:focus {
+    border-color: #86d135;
+    background: #4E4E4E;
+}
+
+.menu-value {
+    flex: 1;
+    text-align: center;
+    padding: 4px 8px;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #dddddd;
+    min-width: 50px;
+    white-space: nowrap;
+}
+
+.menu-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-icon-btn {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+    outline: none;
+}
+
+.menu-icon-btn i,
+.menu-icon-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+    color: inherit;
+    stroke: currentColor;
+}
+
+.menu-icon-btn:hover {
+    background: #4E4E4E;
+}
+
+.menu-icon-btn:active {
+    background: #5E5E5E;
+}
+
+.menu-icon-btn-danger {
+    color: #f44336;
+    border-color: #f44336;
+}
+
+.menu-icon-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: #f44336;
+}
+
+.menu-icon-btn-small {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 3px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.menu-icon-btn-small:hover {
+    background: #4E4E4E;
+}
+
+.menu-icon-btn-small i,
+.menu-icon-btn-small svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 1.5;
+}
+
+.person-search-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.person-search-input {
+    width: 100%;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #dddddd;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+}
+
+.person-search-input:focus {
+    border-color: #86d135;
+    background: #4E4E4E;
+}
+
+.person-search-input::placeholder {
+    color: #888888;
+}
+
+.person-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10001;
+    display: none;
+    width: 100%;
+}
+
+.person-search-results.show {
+    display: block;
+}
+
+.person-search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #dddddd;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+}
+
+.person-search-result-item:hover,
+.person-search-result-item[data-selected="true"] {
+    background: #3E3E3E;
+}
+
+.person-search-result-avatar {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+}
+
+.tag-select-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.tag-select-btn {
+    width: 100%;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #dddddd;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.tag-select-btn:hover {
+    background: #3E3E3E;
+}
+
+.tag-select-btn:focus {
+    border-color: #86d135;
+    background: #4E4E4E;
+}
+
+.tag-select-icon {
+    width: 10px;
+    height: 10px;
+    stroke-width: 2;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.tag-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10001;
+    display: none;
+    width: 100%;
+}
+
+.tag-select-dropdown.show {
+    display: block;
+}
+
+.tag-select-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #dddddd;
+    transition: background 0.2s;
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+}
+
+.tag-select-item:hover,
+.tag-select-item.selected {
+    background: #3E3E3E;
+}
+
+/* Menú contextual horizontal estilo Kanban - dos filas */
+.kanban-context-menu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    background: #2E2E2E;
+    border: 1px solid #4E4E4E;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(134, 209, 53, 0.12);
+    padding: 8px;
+    z-index: 10000;
+    -webkit-app-region: no-drag;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.96);
+    transition: opacity 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0.14s ease,
+                transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.kanban-context-menu.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+/* Cierre rápido al cambiar de tarjeta (click derecho en otra) */
+.kanban-context-menu.closing {
+    transition-duration: 0.08s;
+}
+
+.kanban-menu-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.kanban-menu-row-bottom {
+    border-top: 1px solid #3E3E3E;
+    padding-top: 8px;
+    margin-top: 0;
+}
+
+.kanban-menu-item {
+    position: relative;
+}
+
+.kanban-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #DDDDDD;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.kanban-menu-btn:hover {
+    background: #3E3E3E;
+}
+
+.kanban-menu-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kanban-menu-chip.empty {
+    display: none;
+}
+
+.kanban-menu-chevron {
+    width: 12px;
+    height: 12px;
+    stroke-width: 2;
+    opacity: 0.6;
+    transition: transform 0.2s ease;
+}
+
+.kanban-menu-item.active .kanban-menu-chevron {
+    transform: rotate(180deg);
+}
+
+.kanban-menu-flag {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    color: #F44336;
+    fill: #F44336;
+}
+
+.kanban-menu-flag.empty {
+    color: #888888;
+    fill: none;
+}
+
+.kanban-menu-btn-delete {
+    color: #F44336;
+}
+
+.kanban-menu-btn-delete:hover {
+    background: rgba(244, 67, 54, 0.15);
+    color: #F44336;
+}
+
+.kanban-menu-btn-delete i,
+.kanban-menu-btn-delete svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+}
+
+/* Botones solo icono (Marcar y Eliminar) */
+.kanban-menu-btn-icon-only {
+    padding: 6px 8px;
+    min-width: 32px;
+    justify-content: center;
+}
+
+.kanban-menu-item-icon-only {
+    flex-shrink: 0;
+}
+
+.kanban-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    min-width: 180px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10001;
+    display: none;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.kanban-menu-item.active .kanban-menu-dropdown {
+    display: flex;
+}
+
+.kanban-menu-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #DDDDDD;
+    font-size: 13px;
+    transition: background 0.15s ease;
+}
+
+.kanban-menu-option:hover {
+    background: #3E3E3E;
+}
+
+.kanban-menu-option.selected {
+    background: rgba(134, 209, 53, 0.15);
+    color: #86d135;
+}
+
+.kanban-menu-option-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    flex-shrink: 0;
+    transition: color 0.2s ease, fill 0.2s ease;
+}
+
+.kanban-menu-option-icon.empty {
+    color: #888888;
+    fill: none;
+}
+
+.kanban-menu-option-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: auto;
+}
+
+.kanban-menu-search {
+    padding: 8px;
+    border-bottom: 1px solid #3E3E3E;
+}
+
+.kanban-menu-search input {
+    width: 100%;
+    padding: 6px 10px;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    color: #DDDDDD;
+    font-size: 13px;
+    outline: none;
+}
+
+.kanban-menu-search input:focus {
+    border-color: #86d135;
+    background: #3A3A3A;
+}
+
+.kanban-menu-results {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.kanban-menu-result-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #DDDDDD;
+    font-size: 13px;
+    transition: background 0.15s ease;
+}
+
+.kanban-menu-result-item:hover {
+    background: #3E3E3E;
+}
+
+
+/* Tarjeta marcada - teñida de rojo */
+.kanban-card.marked {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+/* Colores de columnas según estado */
+.kanban-column[data-status="pendiente"] {
+    /* border-top removido */
+}
+
+.kanban-column[data-status="pendiente"] .column-header {
+    background: rgba(255, 152, 0, 0.1);
+    border-bottom-color: rgba(255, 152, 0, 0.3);
+}
+
+.kanban-column[data-status="pendiente"] .column-header h2 {
+    color: #FFB74D;
+}
+
+.kanban-column[data-status="en-progreso"] {
+    /* border-top removido */
+}
+
+.kanban-column[data-status="en-progreso"] .column-header {
+    background: rgba(33, 150, 243, 0.1);
+    border-bottom-color: rgba(33, 150, 243, 0.3);
+}
+
+.kanban-column[data-status="en-progreso"] .column-header h2 {
+    color: #64B5F6;
+}
+
+.kanban-column[data-status="hecho"] {
+    /* border-top removido */
+}
+
+.kanban-column[data-status="hecho"] .column-header {
+    background: rgba(76, 175, 80, 0.1);
+    border-bottom-color: rgba(76, 175, 80, 0.3);
+}
+
+.kanban-column[data-status="hecho"] .column-header h2 {
+    color: #81C784;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #252525;
+    border-bottom: 1px solid #3E3E3E;
+    gap: 8px;
+}
+
+.column-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.column-header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.column-count {
+    background: #3E3E3E;
+    color: #dddddd;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.column-sort-btn {
+    background: transparent;
+    border: none;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: #888888;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.column-sort-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #CCCCCC;
+}
+
+.column-sort-btn.active {
+    background: rgba(134, 209, 53, 0.15);
+    color: #86d135;
+}
+
+.column-sort-btn.active:hover {
+    background: rgba(134, 209, 53, 0.25);
+    color: #86d135;
+}
+
+.column-sort-btn i,
+.column-sort-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.5;
+}
+
+.column-header .icon-btn.column-header-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    flex-shrink: 0;
+}
+.column-header .icon-btn.column-header-btn i,
+.column-header .icon-btn.column-header-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Los iconos ahora cambian según el estado, no necesitamos rotación */
+
+.column-content {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100px;
+}
+
+.kanban-column.drag-over .column-content {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+}
+
+.kanban-card {
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    padding: 12px;
+    cursor: grab;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    user-select: none;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.card-action-btn {
+    background: transparent;
+    border: none;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.kanban-card:hover .card-action-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.card-action-btn i {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    line-height: 1;
+}
+
+.card-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    stroke-width: 1.5 !important;
+    display: block;
+    flex-shrink: 0;
+}
+
+.card-action-btn svg {
+    color: #AAAAAA !important;
+    stroke: #AAAAAA !important;
+}
+
+.card-action-btn:hover {
+    background: #3E3E3E;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.card-action-btn:hover svg {
+    color: #DDDDDD !important;
+    stroke: #DDDDDD !important;
+    transition: color 0.2s ease, stroke 0.2s ease;
+}
+
+.card-delete-btn-footer {
+    color: #888888;
+}
+
+.card-delete-btn-footer:hover {
+    background: #5E5E5E;
+    border-color: #6E6E6E;
+    color: #FFFFFF;
+}
+
+.card-delete-btn-footer svg {
+    color: #AAAAAA !important;
+    stroke: #AAAAAA !important;
+}
+
+.card-delete-btn-footer:hover svg {
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+}
+
+.kanban-card:hover {
+    background: #3A3A3A;
+    border-color: #4E4E4E;
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.kanban-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: rotate(2deg);
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+}
+
+.card-content {
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #3E3E3E;
+    min-height: 32px;
+    position: relative;
+}
+
+.card-person-avatar {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: default;
+}
+
+.card-priority {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+}
+
+.card-tag {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+    cursor: default;
+    transition: opacity 0.2s ease;
+}
+
+/* Chip de etiqueta - mismo estilo que las etiquetas de personas */
+.chip-tag {
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+}
+
+.chip-tag:hover {
+    opacity: 0.85;
+}
+
+/* Chips de prioridad - mismos colores que en las notas */
+.chip-priority.chip-p5 {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #4CAF50;
+    color: #81C784;
+}
+
+.chip-priority.chip-p4 {
+    background: rgba(139, 195, 74, 0.15);
+    border-color: #8BC34A;
+    color: #AED581;
+}
+
+.chip-priority.chip-p3 {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: #FFC107;
+    color: #FFD54F;
+}
+
+.chip-priority.chip-p2 {
+    background: rgba(255, 152, 0, 0.15);
+    border-color: #FF9800;
+    color: #FFB74D;
+}
+
+.chip-priority.chip-p1 {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: #F44336;
+    color: #E57373;
+}
+
+.card-note-name {
+    font-size: 11px;
+    color: #888888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 150px;
+}
+
+/* Scrollbar personalizado */
+.column-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.column-content::-webkit-scrollbar-track {
+    background: #2E2E2E;
+    border-radius: 4px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background: #4E4E4E;
+    border-radius: 4px;
+}
+
+.column-content::-webkit-scrollbar-thumb:hover {
+    background: #5E5E5E;
+}
+
+.kanban-board::-webkit-scrollbar {
+    height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: #2E2E2E;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: #4E4E4E;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #5E5E5E;
+}
+
+/* Modal de confirmación */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: #2E2E2E;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #3E3E3E;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body p {
+    color: #CCCCCC;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-warning {
+    color: #F44336 !important;
+    font-size: 13px !important;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #3E3E3E;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 80px;
+}
+
+.modal-btn-secondary {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+.modal-btn-secondary:hover {
+    background: #4E4E4E;
+}
+
+.modal-btn-danger {
+    background: #F44336;
+    color: #FFFFFF;
+}
+
+.modal-btn-danger:hover {
+    background: #E53935;
+}
+
+.modal-btn-primary {
+    background: #86d135;
+    color: #FFFFFF;
+}
+
+.modal-btn-primary:hover {
+    background: #7bc02a;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: #AAAAAA;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero Kanban</title>
+    <link rel="stylesheet" href="kanban-styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="kanban-container">
+        <div class="kanban-header">
+            <h1>Tablero Kanban</h1>
+            <div class="header-actions">
+                <button id="toggleFiltersBtn" class="icon-btn toggle-filters-btn" title="Mostrar u ocultar filtros">
+                    <i data-lucide="filter"></i>
+                </button>
+                <button id="refreshBtn" class="icon-btn refresh-btn" title="Actualizar">
+                    <i data-lucide="refresh-cw"></i>
+                </button>
+                <button id="notesListBtn" class="icon-btn notes-list-btn" title="Lista de notas">
+                    <i data-lucide="list"></i>
+                </button>
+                <button id="exportReportBtn" class="icon-btn export-report-btn" title="Copiar informe del tablero (Markdown)">
+                    <i data-lucide="file-text"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="kanbanFilters" class="kanban-filters">
+            <div class="filter-group">
+                <label for="filterPerson" class="filter-label">
+                    <i data-lucide="user"></i>
+                    <span>Persona asignada</span>
+                </label>
+                <select id="filterPerson" class="filter-select">
+                    <option value="">Todas las personas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterPriority" class="filter-label">
+                    <i data-lucide="flag"></i>
+                    <span>Prioridad</span>
+                </label>
+                <select id="filterPriority" class="filter-select">
+                    <option value="">Todas las prioridades</option>
+                    <option value="p1">P1 - Alta</option>
+                    <option value="p2">P2</option>
+                    <option value="p3">P3</option>
+                    <option value="p4">P4</option>
+                    <option value="p5">P5 - Baja</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterTag" class="filter-label">
+                    <i data-lucide="tag"></i>
+                    <span>Etiqueta</span>
+                </label>
+                <select id="filterTag" class="filter-select">
+                    <option value="">Todas las etiquetas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterDays" class="filter-label">
+                    <i data-lucide="calendar"></i>
+                    <span>Creadas</span>
+                </label>
+                <select id="filterDays" class="filter-select">
+                    <option value="">Todas</option>
+                    <option value="1">Último día</option>
+                    <option value="2">Últimos 2 días</option>
+                    <option value="3">Últimos 3 días</option>
+                    <option value="4">Últimos 4 días</option>
+                    <option value="5">Últimos 5 días</option>
+                    <option value="6">Últimos 6 días</option>
+                    <option value="7">Últimos 7 días</option>
+                </select>
+            </div>
+            
+            <button id="clearFiltersBtn" class="filter-clear-btn" title="Limpiar filtros">
+                <i data-lucide="x"></i>
+                <span>Limpiar</span>
+            </button>
+        </div>
+        
+        <div id="personMetrics" class="person-metrics"></div>
+        <div id="personMetricTooltip" class="person-metric-tooltip" role="tooltip" aria-hidden="true"></div>
+        
+        <div class="kanban-board">
+            <div class="kanban-column" data-status="pendiente">
+                <div class="column-header">
+                    <div class="column-header-left">
+                        <h2>Pendiente</h2>
+                        <span class="column-count" id="count-pendiente">0</span>
+                    </div>
+                    <button class="column-sort-btn" data-status="pendiente" title="Ordenar por prioridad">
+                        <i data-lucide="arrow-up-down"></i>
+                    </button>
+                </div>
+                <div class="column-content" id="column-pendiente">
+                    <!-- Cards se agregarán aquí -->
+                </div>
+            </div>
+            
+            <div class="kanban-column" data-status="en-progreso">
+                <div class="column-header">
+                    <div class="column-header-left">
+                        <h2>En Progreso</h2>
+                        <span class="column-count" id="count-en-progreso">0</span>
+                    </div>
+                    <button class="column-sort-btn" data-status="en-progreso" title="Ordenar por prioridad">
+                        <i data-lucide="arrow-up-down"></i>
+                    </button>
+                </div>
+                <div class="column-content" id="column-en-progreso">
+                    <!-- Cards se agregarán aquí -->
+                </div>
+            </div>
+            
+            <div class="kanban-column" data-status="hecho">
+                <div class="column-header">
+                    <div class="column-header-left">
+                        <h2>Hecho</h2>
+                        <span class="column-count" id="count-hecho">0</span>
+                    </div>
+                    <button class="column-sort-btn" data-status="hecho" title="Ordenar por prioridad">
+                        <i data-lucide="arrow-up-down"></i>
+                    </button>
+                    <button id="toggleDoneColumnBtn" class="icon-btn column-header-btn toggle-done-column-btn" title="Ocultar columna Hecho">
+                        <i data-lucide="eye-off"></i>
+                    </button>
+                </div>
+                <div class="column-content" id="column-hecho">
+                    <!-- Cards se agregarán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Eliminar bloque</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar este bloque?</p>
+                <p class="modal-warning">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCancelBtn" class="modal-btn modal-btn-secondary">Cancelar</button>
+                <button id="modalConfirmBtn" class="modal-btn modal-btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de mensaje (informe copiado, etc.) -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="messageModalTitle">Mensaje</h3>
+            </div>
+            <div class="modal-body">
+                <p id="messageModalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="messageModalOkBtn" class="modal-btn modal-btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menú contextual para tarjetas -->
+    <div id="cardContextMenu" class="kanban-context-menu">
+        <div class="kanban-menu-row kanban-menu-row-top">
+            <div class="kanban-menu-item">
+                <button type="button" id="priorityMenuBtn" class="kanban-menu-btn">
+                    <span id="priorityChip" class="kanban-menu-chip"></span>
+                    <span id="priorityLabel">Prioridad</span>
+                    <i data-lucide="chevron-down" class="kanban-menu-chevron"></i>
+                </button>
+                <div id="priorityDropdown" class="kanban-menu-dropdown">
+                    <!-- Se poblará dinámicamente -->
+                </div>
+            </div>
+            <div class="kanban-menu-item">
+                <button type="button" id="personMenuBtn" class="kanban-menu-btn">
+                    <span id="personChip" class="kanban-menu-chip"></span>
+                    <span id="personLabel">Asignar a</span>
+                    <i data-lucide="chevron-down" class="kanban-menu-chevron"></i>
+                </button>
+                <div id="personDropdown" class="kanban-menu-dropdown">
+                    <div class="kanban-menu-search">
+                        <input type="text" id="personSearchInput" placeholder="Buscar persona..." autocomplete="off">
+                    </div>
+                    <div id="personSearchResults" class="kanban-menu-results"></div>
+                </div>
+            </div>
+        </div>
+        <div class="kanban-menu-row kanban-menu-row-bottom">
+            <div class="kanban-menu-item">
+                <button type="button" id="tagMenuBtn" class="kanban-menu-btn">
+                    <span id="tagChip" class="kanban-menu-chip"></span>
+                    <span id="tagLabel">Etiqueta</span>
+                    <i data-lucide="chevron-down" class="kanban-menu-chevron"></i>
+                </button>
+                <div id="tagDropdown" class="kanban-menu-dropdown">
+                    <!-- Se poblará dinámicamente -->
+                </div>
+            </div>
+            <div class="kanban-menu-item kanban-menu-item-icon-only">
+                <button type="button" id="markMenuBtn" class="kanban-menu-btn kanban-menu-btn-icon-only" title="Marcar / Desmarcar">
+                    <i data-lucide="flag" id="markIcon" class="kanban-menu-flag"></i>
+                </button>
+            </div>
+            <div class="kanban-menu-item kanban-menu-item-delete kanban-menu-item-icon-only">
+                <button type="button" id="deleteMenuBtn" class="kanban-menu-btn kanban-menu-btn-delete kanban-menu-btn-icon-only" title="Eliminar">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="kanban-renderer.js"></script>
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

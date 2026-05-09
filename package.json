@@ -1,0 +1,44 @@
+{
+  "name": "notas-rapidas",
+  "version": "0.5.2",
+  "description": "Aplicación de notas rápidas tipo post-it para escritorio",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "node scripts/build-win.js patch",
+    "build:win:patch": "node scripts/build-win.js patch",
+    "build:win:minor": "node scripts/build-win.js minor",
+    "build:win:major": "node scripts/build-win.js major",
+    "build:win:no-bump": "node scripts/build-win.js --no-bump"
+  },
+  "keywords": [
+    "notas",
+    "post-it",
+    "desktop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.notasrapidas.app",
+    "productName": "Notas Rápidas 2",
+    "win": {
+      "target": "dir",
+      "icon": "assets/icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*"
+    ],
+    "nsis": {
+      "oneClick": false,
+      "icon": "assets/icon.ico"
+    }
+  }
+}

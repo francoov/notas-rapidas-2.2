@@ -1,0 +1,1760 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #333333;
+    height: 100vh;
+    overflow: hidden;
+    /* El arrastre de la ventana solo en la barra verde (.note-header-toolbar), no en todo el body */
+    -webkit-app-region: no-drag;
+}
+
+.note-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #333333;
+    -webkit-app-region: no-drag;
+}
+
+/* Header en dos filas: barra de acciones (verde) + fila de título (gris oscuro) */
+.note-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    -webkit-app-region: no-drag;
+    cursor: default;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Solo la franja verde arrastra la ventana y muestra cursor de mover */
+.note-header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: #86d135;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: drag;
+    cursor: move;
+}
+
+.note-header-title-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: #1e1e1e;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid #141414;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+    cursor: default;
+}
+
+.icon-btn-header {
+    background: transparent;
+    border: none;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    /* Misma caja y área clickeable para +, … y X */
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
+    flex-shrink: 0;
+}
+
+.icon-btn-header i,
+.icon-btn-header svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+    flex-shrink: 0; /* Evitar que el icono se comprima */
+}
+
+.icon-btn-header:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.icon-btn-header:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.icon-btn-header:disabled:hover {
+    background: transparent;
+}
+
+.header-btn-tooltip-wrap {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.header-btn-tooltip-wrap:has(button:disabled) {
+    cursor: not-allowed;
+}
+
+.header-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
+    margin-left: auto; /* Empujar los botones a la derecha */
+}
+
+.note-title-input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ececec;
+    padding: 2px 2px;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
+    letter-spacing: -0.01em;
+}
+
+.note-title-input::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    line-height: 1;
+    -webkit-app-region: no-drag;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.toolbar {
+    display: flex;
+    gap: 5px;
+    padding: 8px 16px 6px 16px; /* Reducir padding vertical para hacer más estrecho */
+    border-top: 1px solid #3E3E3E;
+    background: #333333;
+    -webkit-app-region: no-drag;
+    margin-top: auto;
+}
+
+.toolbar-btn {
+    background: transparent;
+    border: none; /* Sin borde */
+    border-radius: 4px;
+    width: 24px; /* Reducir de 32px a 24px */
+    height: 24px; /* Reducir de 32px a 24px */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px; /* Reducir tamaño de fuente */
+    color: #FFFFFF;
+    transition: background 0.2s;
+}
+
+.toolbar-btn:hover {
+    background: #3E3E3E; /* Mantener hover */
+}
+
+.toolbar-btn.active {
+    background: #4E4E4E;
+}
+
+.note-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #FFFFFF;
+    -webkit-app-region: no-drag;
+    padding: 16px 16px 16px 4px;
+    background: #333333;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.note-content:empty:before {
+    content: attr(placeholder);
+    color: #888888;
+}
+
+/* Bloques de contenido */
+.content-block {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 2px;
+    padding: 2px 0;
+    min-height: 24px;
+    width: 100%;
+    overflow-x: hidden;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+body.shift-pressed .content-block,
+body.shift-pressed .content-block * {
+    cursor: pointer !important;
+}
+
+.content-block:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.content-block.block-selected {
+    background: rgba(134, 209, 53, 0.15);
+    border: 1px solid rgba(134, 209, 53, 0.4);
+    border-radius: 4px;
+}
+
+.content-block.block-focused-from-kanban {
+    background: rgba(134, 209, 53, 0.15);
+    border-radius: 4px;
+    animation: fadeInFocus 0.15s ease-out;
+}
+
+@keyframes fadeInFocus {
+    from {
+        background: rgba(134, 209, 53, 0);
+    }
+    to {
+        background: rgba(134, 209, 53, 0.15);
+    }
+}
+
+.content-block.block-focused-from-kanban.fade-out {
+    animation: fadeOutFocus 0.3s ease-out forwards;
+}
+
+@keyframes fadeOutFocus {
+    from {
+        background: rgba(134, 209, 53, 0.15);
+    }
+    to {
+        background: rgba(134, 209, 53, 0);
+    }
+}
+
+/* Bloque marcado - teñido de rojo */
+.content-block.marked {
+    background: rgba(244, 67, 54, 0.15) !important;
+    border-radius: 4px;
+}
+
+.content-block.marked:hover {
+    background: rgba(244, 67, 54, 0.2) !important;
+}
+
+.block-content {
+    flex: 1;
+    outline: none;
+    min-height: 20px;
+    padding-left: 28px;
+    color: #FFFFFF;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-x: hidden;
+    max-width: 100%;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+.block-content:focus {
+    outline: none;
+}
+
+.block-content p {
+    margin: 0;
+    color: #FFFFFF;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.block-content ul,
+.block-content ol {
+    margin-left: 20px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    color: #FFFFFF;
+}
+
+.block-content li {
+    margin-bottom: 2px;
+    color: #FFFFFF;
+}
+
+/* Handle (puntitos) */
+.block-handle {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 24px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+    -webkit-app-region: no-drag;
+}
+
+.content-block:hover .block-handle,
+.content-block:focus-within .block-handle {
+    display: flex !important;
+}
+
+.block-handle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.handle-dots {
+    font-size: 16px;
+    color: #888888;
+    line-height: 1;
+    letter-spacing: -2px;
+    user-select: none;
+}
+
+.handle-dots:hover {
+    color: #FFFFFF;
+}
+
+/* Chips de metadatos */
+.block-chips {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    padding-right: 8px;
+}
+
+.chip {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+}
+
+.chip:hover {
+    opacity: 0.85;
+}
+
+/* Chips de estado */
+.chip-status.chip-pendiente {
+    background: rgba(255, 152, 0, 0.15);
+    border-color: #FF9800;
+    color: #FFB74D;
+}
+
+.chip-status.chip-en-progreso {
+    background: rgba(33, 150, 243, 0.15);
+    border-color: #2196F3;
+    color: #64B5F6;
+}
+
+.chip-status.chip-hecho {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #4CAF50;
+    color: #81C784;
+}
+
+/* Chips de prioridad */
+.chip-priority.chip-p5 {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #4CAF50;
+    color: #81C784;
+}
+
+.chip-priority.chip-p4 {
+    background: rgba(139, 195, 74, 0.15);
+    border-color: #8BC34A;
+    color: #AED581;
+}
+
+.chip-priority.chip-p3 {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: #FFC107;
+    color: #FFD54F;
+}
+
+.chip-priority.chip-p2 {
+    background: rgba(255, 152, 0, 0.15);
+    border-color: #FF9800;
+    color: #FFB74D;
+}
+
+.chip-priority.chip-p1 {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: #F44336;
+    color: #E57373;
+}
+
+/* Chip de persona asignada */
+.chip-person {
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+}
+
+/* Chip de etiqueta - mismo estilo que en Kanban */
+.chip-tag {
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+}
+
+.chip-tag:hover {
+    opacity: 0.85;
+}
+
+/* Menú contextual del handle: una sola fila, poco espacio entre ítems */
+.handle-menu {
+    position: fixed;
+    background: #2E2E2E;
+    border: 1px solid #4E4E4E;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(134, 209, 53, 0.12);
+    padding: 6px 6px;
+    min-width: auto;
+    z-index: 10000;
+    display: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    -webkit-app-region: no-drag;
+}
+
+.handle-menu.show {
+    display: flex;
+    overflow: visible; /* submenús no recortados por el contenedor del menú */
+}
+
+.menu-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    justify-content: space-between;
+}
+
+/* Campos compactos: no estirar cada bloque a todo el ancho disponible */
+.handle-menu > .menu-controls {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 0;
+}
+
+.handle-menu > .menu-controls-tag {
+    min-width: 0;
+}
+
+.handle-menu .person-assign-wrapper {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* Desplegables al hacer clic (mismo patrón que Kanban) */
+.handle-menu .menu-controls.handle-menu-item {
+    position: relative;
+}
+
+.handle-menu-chevron {
+    width: 12px;
+    height: 12px;
+    stroke-width: 2;
+    flex-shrink: 0;
+    margin-left: auto;
+    opacity: 0.65;
+    transition: transform 0.2s ease;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.handle-menu-chevron svg {
+    stroke: currentColor;
+    color: inherit;
+}
+
+/* Lucide a veces no hereda color en el trigger de persona */
+.handle-menu #personAssignTrigger {
+    color: #DDDDDD;
+}
+
+.handle-menu #personAssignTrigger .handle-menu-chevron,
+.handle-menu #personAssignTrigger .handle-menu-chevron svg {
+    color: rgba(255, 255, 255, 0.7);
+    stroke: currentColor;
+    opacity: 0.85;
+}
+
+.handle-menu-item.active .handle-menu-chevron,
+.person-assign-wrapper.active .handle-menu-chevron {
+    transform: rotate(180deg);
+}
+
+.handle-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    min-width: 200px;
+    max-width: min(280px, 90vw);
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 10001;
+    display: none;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.handle-menu-item.active > .handle-menu-dropdown {
+    display: flex;
+}
+
+/* Sin espacio abajo en la ventana: abrir el submenú hacia arriba */
+.handle-menu-dropdown.handle-menu-dropdown--up {
+    top: auto;
+    bottom: calc(100% + 4px);
+}
+
+.person-search-dropdown.handle-menu-dropdown--up {
+    top: auto;
+    bottom: calc(100% + 4px);
+}
+
+.handle-menu-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #DDDDDD;
+    font-size: 13px;
+    transition: background 0.15s ease;
+}
+
+.handle-menu-option:hover {
+    background: #3E3E3E;
+}
+
+.handle-menu-option.selected {
+    background: rgba(134, 209, 53, 0.15);
+    color: #86d135;
+}
+
+.handle-menu-option-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: auto;
+}
+
+.handle-menu .menu-actions {
+    gap: 2px;
+}
+
+/* Estilo igual que Kanban (click derecho): botones transparentes, hover #3E3E3E */
+.menu-value-container.menu-focusable {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    min-width: 60px;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    outline: none;
+    color: #DDDDDD;
+    font-size: 13px;
+}
+
+.handle-menu .menu-value-container.menu-focusable {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    padding: 4px 6px;
+}
+
+.menu-value-container.menu-focusable:hover {
+    background: #3E3E3E;
+}
+
+.menu-value-container.menu-focusable:focus-visible {
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.menu-value-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    min-width: 50px;
+    justify-content: center;
+}
+
+.handle-menu .menu-value-container.menu-focusable .menu-value,
+.handle-menu .menu-controls-person .menu-value {
+    font-size: 13px;
+    color: #DDDDDD;
+}
+
+.menu-value {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: #dddddd;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.menu-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.menu-chip.empty {
+    display: none;
+}
+
+.menu-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Botones del menú handle = mismo estilo que Kanban (kanban-menu-btn) */
+.handle-menu .menu-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 6px;
+    min-width: 28px;
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #DDDDDD;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    outline: none;
+}
+
+.handle-menu .menu-icon-btn i,
+.handle-menu .menu-icon-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    color: inherit;
+    stroke: currentColor;
+}
+
+.handle-menu .menu-icon-btn:hover {
+    background: #3E3E3E;
+}
+
+.handle-menu .menu-icon-btn:active {
+    background: #4E4E4E;
+}
+
+.handle-menu .menu-icon-btn-danger {
+    color: #F44336;
+}
+
+.handle-menu .menu-icon-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.15);
+    color: #F44336;
+}
+
+.handle-menu .menu-icon-btn:focus-visible {
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.handle-menu .menu-icon-btn-danger:focus-visible {
+    background: rgba(244, 67, 54, 0.15);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Botones pequeños (quitar persona, quitar etiqueta) = kanban-menu-btn-icon-only */
+.handle-menu .menu-icon-btn-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    min-width: 28px;
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #DDDDDD;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    outline: none;
+}
+
+.handle-menu .menu-icon-btn-small i,
+.handle-menu .menu-icon-btn-small svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+}
+
+.handle-menu .menu-icon-btn-small:hover {
+    background: #3E3E3E;
+}
+
+.handle-menu .menu-icon-btn-small:focus-visible {
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Contenedor persona: mismo look que un botón Kanban cuando tiene foco */
+.handle-menu .menu-controls-person .menu-value-container,
+.handle-menu .menu-controls-person .menu-value-container.menu-value-container-person {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 6px;
+    min-width: 0;
+    flex: 0 1 auto;
+    color: #DDDDDD;
+}
+
+.handle-menu .menu-controls-person .menu-value-container:hover,
+.handle-menu .menu-controls-person .menu-value-container-person:hover {
+    background: #3E3E3E;
+}
+
+.handle-menu .menu-person-label {
+    font-size: 13px;
+    color: #DDDDDD;
+    white-space: nowrap;
+}
+
+.handle-menu #personAssignTrigger {
+    cursor: pointer;
+    outline: none;
+}
+
+.handle-menu #personAssignTrigger:focus-visible {
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.handle-menu .person-search-input {
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    color: #DDDDDD;
+}
+
+.handle-menu .person-search-input::placeholder {
+    color: #888888;
+}
+
+/* Focus en todos los ítems del menú (incl. persona) */
+.handle-menu .person-search-input:focus-visible,
+.handle-menu .person-search-input:focus {
+    outline: none;
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.handle-menu .menu-controls-person:focus-within .menu-value-container {
+    background: #3E3E3E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos base para .menu-icon-btn fuera del handle (por si se usan en otro contexto) */
+.menu-icon-btn {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+    outline: none;
+}
+
+.menu-icon-btn i,
+.menu-icon-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+    color: inherit;
+    stroke: currentColor;
+}
+
+.menu-icon-btn:hover {
+    background: #4E4E4E;
+}
+
+.menu-icon-btn:active {
+    background: #5E5E5E;
+}
+
+.menu-icon-btn-danger {
+    color: #f44336;
+    border-color: #f44336;
+}
+
+.menu-icon-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: #f44336;
+}
+
+.menu-icon-btn:focus-visible {
+    border-color: #5E5E5E;
+    background: #4E4E4E;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon-btn-danger:focus-visible {
+    border-color: #f44336;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Menú de opciones de la nota */
+.note-options-menu {
+    position: fixed;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 4px;
+    min-width: 160px;
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    -webkit-app-region: no-drag;
+}
+
+.note-options-menu.show {
+    display: flex;
+}
+
+.note-option-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #dddddd;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    text-align: left;
+    width: 100%;
+}
+
+.note-option-btn:hover {
+    background: #3E3E3E;
+}
+
+.note-option-btn i,
+.note-option-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.5;
+    flex-shrink: 0;
+}
+
+.note-option-btn-danger {
+    color: #f44336;
+}
+
+.note-option-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.note-option-btn-danger i,
+.note-option-btn-danger svg {
+    color: #f44336;
+    stroke: #f44336;
+}
+
+.note-option-btn-navigation {
+    color: #86d135;
+}
+
+.note-option-btn-navigation:hover {
+    background: rgba(134, 209, 53, 0.1);
+}
+
+.note-option-btn-navigation i,
+.note-option-btn-navigation svg {
+    color: #86d135;
+    stroke: #86d135;
+}
+
+.note-options-divider {
+    height: 1px;
+    background: #3E3E3E;
+    margin: 4px 0;
+}
+
+/* Modal de confirmación */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: #2E2E2E;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal-content-small {
+    max-width: 320px;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #3E3E3E;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body p {
+    color: #CCCCCC;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-warning {
+    color: #F44336 !important;
+    font-size: 13px !important;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #3E3E3E;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 80px;
+}
+
+.modal-btn-secondary {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+.modal-btn-secondary:hover {
+    background: #4E4E4E;
+}
+
+.modal-btn-danger {
+    background: #F44336;
+    color: #FFFFFF;
+}
+
+.modal-btn-danger:hover {
+    background: #E53935;
+}
+
+.tags-list-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tag-option {
+    padding: 12px 16px;
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.tag-option:hover {
+    background: #4E4E4E;
+    border-color: #5E5E5E;
+}
+
+.tag-option.selected {
+    background: rgba(134, 209, 53, 0.2);
+    border-color: #86d135;
+    color: #86d135;
+}
+
+.remove-tag-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 6px;
+    color: #F44336;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.remove-tag-btn:hover {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.5);
+}
+
+.remove-tag-btn i,
+.remove-tag-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+}
+
+/* Etiqueta en el header de la nota - mismo formato que los chips pero más notoria */
+.note-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: default;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
+}
+
+.note-header-title-row .note-tag,
+.note-header .note-tag {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #e0e0e0;
+    font-weight: 500;
+    font-size: 10px;
+    padding: 4px 10px;
+}
+
+.note-header-title-row .note-tag:hover,
+.note-header .note-tag:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.note-header-title-row .note-tag.clickable-tag,
+.note-header .note-tag.clickable-tag {
+    cursor: pointer;
+}
+
+.note-header-title-row .note-tag.clickable-tag:hover,
+.note-header .note-tag.clickable-tag:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Botón "+ Etiqueta" */
+.add-tag-btn {
+    display: none !important;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #e0e0e0;
+    font-weight: 500;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+/* El hover ahora se maneja con JavaScript para funcionar en toda el área del header */
+.note-header:hover .add-tag-btn:not(.hidden) {
+    display: inline-flex !important;
+}
+
+.add-tag-btn.hidden {
+    display: none !important;
+}
+
+.add-tag-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown de etiquetas */
+.tag-dropdown {
+    position: fixed;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 4px;
+    min-width: 160px;
+    max-height: 300px;
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    -webkit-app-region: no-drag;
+    overflow-y: auto;
+}
+
+.tag-dropdown.show {
+    display: flex;
+}
+
+.tag-dropdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tag-dropdown-item {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: #dddddd;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    text-align: left;
+    width: 100%;
+}
+
+.tag-dropdown-item:hover {
+    background: #3E3E3E;
+}
+
+.tag-dropdown-item.selected {
+    background: rgba(134, 209, 53, 0.15);
+    color: #86d135;
+}
+
+.tag-dropdown-item.selected:hover {
+    background: rgba(134, 209, 53, 0.25);
+}
+
+.tag-dropdown-item-danger {
+    color: #f44336;
+}
+
+.tag-dropdown-item-danger:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.tag-dropdown-item i,
+.tag-dropdown-item svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.5;
+    flex-shrink: 0;
+}
+
+.tag-dropdown-item-danger i,
+.tag-dropdown-item-danger svg {
+    color: #f44336;
+    stroke: #f44336;
+}
+
+.tag-dropdown-divider {
+    height: 1px;
+    background: #3E3E3E;
+    margin: 4px 0;
+}
+
+.tag-dropdown-empty {
+    padding: 16px;
+    text-align: center;
+    color: #888888;
+}
+
+.tag-dropdown-empty p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.tag-dropdown-empty-hint {
+    font-size: 11px !important;
+    color: #666666 !important;
+}
+
+/* Scrollbar para el dropdown */
+.tag-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tag-dropdown::-webkit-scrollbar-track {
+    background: #2E2E2E;
+    border-radius: 3px;
+}
+
+.tag-dropdown::-webkit-scrollbar-thumb {
+    background: #4E4E4E;
+    border-radius: 3px;
+}
+
+.tag-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #5E5E5E;
+}
+
+/* Diálogo de Enter */
+.enter-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+}
+
+.enter-dialog.show {
+    display: flex;
+}
+
+.enter-dialog-content {
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 300px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.enter-dialog-content p {
+    margin-bottom: 15px;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.dialog-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.dialog-select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    background: #333333;
+    color: #FFFFFF;
+}
+
+.dialog-select:focus {
+    border-color: #0078d4;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.dialog-btn {
+    padding: 8px 16px;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    background: #3E3E3E;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    color: #FFFFFF;
+}
+
+.dialog-btn:hover {
+    background: #4E4E4E;
+}
+
+.dialog-btn.primary {
+    background: #0078d4;
+    color: white;
+    border-color: #0078d4;
+}
+
+.dialog-btn.primary:hover {
+    background: #0066b3;
+}
+
+/* Scrollbar styling */
+.note-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.note-content::-webkit-scrollbar-track {
+    background: #333333;
+}
+
+.note-content::-webkit-scrollbar-thumb {
+    background: #3E3E3E;
+    border-radius: 4px;
+}
+
+.note-content::-webkit-scrollbar-thumb:hover {
+    background: #4E4E4E;
+}
+
+/* Estilos para asignación de personas */
+.menu-controls-person {
+    flex-direction: row;
+    gap: 4px;
+    min-width: 50px;
+    position: relative;
+}
+
+.menu-controls-tag {
+    flex-direction: row;
+    gap: 4px;
+    min-width: 70px;
+    position: relative;
+    align-items: center;
+}
+
+.person-search-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Wrapper y dropdown "Asignar a" como en Kanban */
+.person-assign-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.person-search-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    min-width: 180px;
+    max-height: 300px;
+    z-index: 10001;
+    display: none;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.person-search-dropdown.show {
+    display: flex;
+}
+
+.person-search-dropdown-search {
+    margin-bottom: 6px;
+}
+
+.person-search-dropdown-search .person-search-input {
+    width: 100%;
+    padding: 6px 10px;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    color: #DDDDDD;
+    font-size: 13px;
+    outline: none;
+}
+
+.person-search-dropdown-search .person-search-input::placeholder {
+    color: #888888;
+}
+
+.person-search-dropdown .person-search-results {
+    position: static;
+    margin-top: 0;
+    max-height: 200px;
+    flex: 1;
+    min-height: 0;
+}
+
+.person-search-input {
+    width: 100%;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #dddddd;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    min-width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.person-search-input:focus {
+    border-color: #86d135;
+    background: #4E4E4E;
+}
+
+.person-search-input::placeholder {
+    color: #888888;
+}
+
+.person-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    min-width: 120px;
+    width: max-content;
+    max-width: 200px;
+}
+
+.person-search-results.show {
+    display: block;
+}
+
+.person-search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #dddddd;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+}
+
+.person-search-result-create {
+    border-top: 1px solid #3E3E3E;
+    margin-top: 4px;
+    padding-top: 8px;
+}
+
+.person-search-result-create:hover,
+.person-search-result-create[data-selected="true"] {
+    background: rgba(134, 209, 53, 0.1);
+}
+
+.person-search-result-item:hover,
+.person-search-result-item[data-selected="true"] {
+    background: #3E3E3E;
+}
+
+.person-search-result-item:focus {
+    background: #3E3E3E;
+    border: 1px solid #86d135;
+    border-radius: 3px;
+}
+
+.person-search-result-avatar {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    letter-spacing: 0.1px;
+    line-height: 1.3;
+    background: rgba(158, 158, 158, 0.15);
+    border-color: #9E9E9E;
+    color: #BDBDBD;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
+.menu-icon-btn-small {
+    background: #3E3E3E;
+    border: 1px solid #4E4E4E;
+    border-radius: 3px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.menu-icon-btn-small:hover {
+    background: #4E4E4E;
+}
+
+.menu-icon-btn-small i,
+.menu-icon-btn-small svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 1.5;
+}
+
+/* Estilos para selector de etiquetas */
+.tag-select-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.tag-select-btn {
+    width: 100%;
+    background: #333333;
+    border: 1px solid #3E3E3E;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #dddddd;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    min-width: 70px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.tag-select-btn:hover {
+    background: #3E3E3E;
+}
+
+.tag-select-btn:focus {
+    border-color: #86d135;
+    background: #4E4E4E;
+}
+
+.tag-select-icon {
+    width: 10px;
+    height: 10px;
+    stroke-width: 2;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.tag-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #2E2E2E;
+    border: 1px solid #3E3E3E;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    min-width: 120px;
+    width: max-content;
+    max-width: 200px;
+}
+
+.tag-select-dropdown.show {
+    display: block;
+}
+
+.tag-select-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #dddddd;
+    transition: background 0.2s;
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.tag-select-item:hover,
+.tag-select-item.selected {
+    background: #3E3E3E;
+}
+
+.tag-select-item:focus {
+    background: #3E3E3E;
+    border: 1px solid #86d135;
+    border-radius: 3px;
+}
+.tag-select-empty {
+    padding: 12px;
+    text-align: center;
+    color: #888888;
+    font-size: 11px;
+}
+
+.tag-select-empty p {
+    margin: 4px 0;
+}
+
+.tag-select-empty-hint {
+    font-size: 10px;
+    color: #666666;
+}

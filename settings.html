@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración</title>
+    <link rel="stylesheet" href="settings-styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1>Configuración</h1>
+            <button id="notesListBtn" class="icon-btn notes-list-btn" title="Lista de notas">
+                <i data-lucide="list"></i>
+            </button>
+        </div>
+        
+        <div class="settings-content">
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="persons">
+                    <i data-lucide="users"></i>
+                    <span>Personas</span>
+                </button>
+                <button class="settings-tab" data-tab="tags">
+                    <i data-lucide="tag"></i>
+                    <span>Etiquetas</span>
+                </button>
+            </div>
+            
+            <div class="settings-tab-content active" id="tab-persons">
+                <div class="settings-section">
+                    <h2>Personas</h2>
+                    <p class="section-description">Gestiona las personas que pueden ser asignadas a las tareas</p>
+                    
+                    <div class="add-person-form">
+                        <input type="text" id="personFirstName" class="form-input" placeholder="Nombre (requerido)" maxlength="50">
+                        <input type="text" id="personLastName" class="form-input" placeholder="Apellido (opcional)" maxlength="50">
+                        <button type="button" id="addPersonBtn" class="add-btn">
+                            <i data-lucide="plus"></i>
+                            <span>Agregar</span>
+                        </button>
+                    </div>
+                    
+                    <div class="persons-list" id="personsList">
+                        <!-- Las personas se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-tab-content" id="tab-tags">
+                <div class="settings-section">
+                    <h2>Etiquetas</h2>
+                    <p class="section-description">Gestiona las etiquetas que puedes asignar a las notas</p>
+                    
+                    <div class="add-tag-form">
+                        <input type="text" id="tagName" class="form-input" placeholder="Nombre de la etiqueta (requerido)" maxlength="30">
+                        <button type="button" id="addTagBtn" class="add-btn" title="Agregar etiqueta">
+                            <i data-lucide="plus"></i>
+                            <span>Agregar</span>
+                        </button>
+                    </div>
+                    
+                    <div class="tags-list" id="tagsList">
+                        <!-- Las etiquetas se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="settings-footer">
+            <p class="settings-app-version" id="appVersionLabel">Versión …</p>
+        </footer>
+    </div>
+
+    <!-- Modal estándar de confirmación / aviso -->
+    <div id="appModal" class="app-modal">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <h3 id="appModalTitle">Título</h3>
+            </div>
+            <div class="app-modal-body">
+                <p id="appModalMessage"></p>
+                <p id="appModalWarning" class="app-modal-warning" style="display: none;"></p>
+            </div>
+            <div class="app-modal-footer">
+                <button type="button" id="appModalCancelBtn" class="app-modal-btn app-modal-btn-secondary">Cancelar</button>
+                <button type="button" id="appModalConfirmBtn" class="app-modal-btn app-modal-btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings-renderer.js"></script>
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

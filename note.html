@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota</title>
+    <link rel="stylesheet" href="note-styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="note-container">
+        <div class="note-header">
+            <div class="note-header-toolbar">
+                <button id="newNoteBtn" class="icon-btn-header" type="button" title="Nueva nota" aria-label="Nueva nota"><i data-lucide="plus"></i></button>
+                <div class="header-actions">
+                    <span class="header-btn-tooltip-wrap" title="Retroceder (Ctrl+Z)">
+                        <button id="undoBtn" type="button" class="icon-btn-header" aria-label="Retroceder"><i data-lucide="undo-2"></i></button>
+                    </span>
+                    <span class="header-btn-tooltip-wrap" title="Re-hacer (Ctrl+Shift+Z)">
+                        <button id="redoBtn" type="button" class="icon-btn-header" aria-label="Re-hacer"><i data-lucide="redo-2"></i></button>
+                    </span>
+                    <button id="optionsBtn" class="icon-btn-header" type="button" title="Opciones" aria-label="Opciones"><i data-lucide="more-horizontal"></i></button>
+                    <button id="closeBtn" class="icon-btn-header" type="button" title="Cerrar" aria-label="Cerrar"><i data-lucide="x"></i></button>
+                </div>
+            </div>
+            <div class="note-header-title-row">
+                <input type="text" id="noteTitle" class="note-title-input" placeholder="Toma una nota..." maxlength="30">
+            </div>
+        </div>
+
+        <!-- Menú de opciones de la nota -->
+        <div id="noteOptionsMenu" class="note-options-menu">
+            <button id="notesListBtn" class="note-option-btn note-option-btn-navigation">
+                <i data-lucide="list"></i>
+                <span>Lista de notas</span>
+            </button>
+            <button id="kanbanBtn" class="note-option-btn note-option-btn-navigation">
+                <i data-lucide="layout-grid"></i>
+                <span>Tablero Kanban</span>
+            </button>
+            <div class="note-options-divider"></div>
+            <button id="closeNoteBtn" class="note-option-btn">
+                <i data-lucide="circle"></i>
+                <span>Cerrar nota</span>
+            </button>
+            <button id="deleteNoteBtn" class="note-option-btn note-option-btn-danger">
+                <i data-lucide="trash-2"></i>
+                <span>Eliminar nota</span>
+            </button>
+        </div>
+
+        <div id="noteContent" class="note-content" placeholder="Tomar notas..."></div>
+        
+        <div class="toolbar">
+            <button class="toolbar-btn" id="boldBtn" title="Negrita">
+                <strong>B</strong>
+            </button>
+            <button class="toolbar-btn" id="italicBtn" title="Cursiva">
+                <em>I</em>
+            </button>
+            <button class="toolbar-btn" id="underlineBtn" title="Subrayado">
+                <u>U</u>
+            </button>
+            <button class="toolbar-btn" id="strikethroughBtn" title="Tachado">
+                <s>S</s>
+            </button>
+            <button class="toolbar-btn" id="bulletBtn" title="Lista">
+                •
+            </button>
+        </div>
+
+        <!-- Handle template (se clonará para cada bloque) -->
+        <div class="block-handle" style="display: none;">
+            <div class="handle-dots">⋮⋮</div>
+        </div>
+
+        <!-- Menú contextual del handle (una sola fila) -->
+        <div id="handleMenu" class="handle-menu">
+            <div class="menu-controls handle-menu-item handle-menu-item-status">
+                <div class="menu-value-container menu-focusable" id="statusFocusTarget" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="statusChip" class="menu-chip"></span>
+                    <span class="menu-value" id="statusValue">Sin estado</span>
+                    <i data-lucide="chevron-down" class="handle-menu-chevron" aria-hidden="true"></i>
+                </div>
+                <div id="handleStatusDropdown" class="handle-menu-dropdown" role="listbox"></div>
+            </div>
+            <div class="menu-controls handle-menu-item handle-menu-item-priority">
+                <div class="menu-value-container menu-focusable" id="priorityFocusTarget" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="priorityChip" class="menu-chip"></span>
+                    <span class="menu-value" id="priorityValue">Sin prioridad</span>
+                    <i data-lucide="chevron-down" class="handle-menu-chevron" aria-hidden="true"></i>
+                </div>
+                <div id="handlePriorityDropdown" class="handle-menu-dropdown" role="listbox"></div>
+            </div>
+                <div class="menu-controls menu-controls-person">
+                    <div class="person-assign-wrapper handle-menu-item handle-menu-item-person">
+                        <div class="menu-value-container menu-value-container-person" id="personAssignTrigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                            <span id="personChip" class="menu-chip"></span>
+                            <span id="personLabel" class="menu-value menu-person-label">Sin asignación</span>
+                            <i data-lucide="chevron-down" class="handle-menu-chevron" aria-hidden="true"></i>
+                        </div>
+                        <div id="personSearchDropdown" class="person-search-dropdown">
+                            <div class="person-search-dropdown-search">
+                                <input type="text" id="personSearchInput" class="person-search-input" placeholder="Buscar persona..." autocomplete="off">
+                            </div>
+                            <div id="personSearchResults" class="person-search-results"></div>
+                        </div>
+                    </div>
+                </div>
+            <div class="menu-controls handle-menu-item handle-menu-item-tag menu-controls-tag">
+                <div class="menu-value-container menu-focusable" id="tagFocusTarget" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="tagChip" class="menu-chip"></span>
+                    <span class="menu-value" id="tagValue">Sin etiqueta</span>
+                    <i data-lucide="chevron-down" class="handle-menu-chevron" aria-hidden="true"></i>
+                </div>
+                <div id="handleTagDropdown" class="handle-menu-dropdown" role="listbox"></div>
+            </div>
+            <div class="menu-actions">
+                <button id="removeMetadataBtn" class="menu-icon-btn" title="Quitar metadatos" tabindex="0">
+                    <i data-lucide="x-circle"></i>
+                </button>
+                <button id="deleteBlockBtn" class="menu-icon-btn menu-icon-btn-danger" title="Eliminar bloque" tabindex="0">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación de eliminación -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Eliminar nota</h3>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que quieres eliminar esta nota?</p>
+                    <p class="modal-warning">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="modalCancelBtn" class="modal-btn modal-btn-secondary">Cancelar</button>
+                    <button id="modalConfirmBtn" class="modal-btn modal-btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diálogo de estado/prioridad al presionar Enter -->
+        <div id="enterDialog" class="enter-dialog">
+            <div class="enter-dialog-content">
+                <p>¿Agregar estado y/o prioridad al bloque?</p>
+                <div class="dialog-options">
+                    <select id="enterStatusSelect" class="dialog-select">
+                        <option value="">Sin estado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en-progreso">En progreso</option>
+                        <option value="hecho">Hecho</option>
+                    </select>
+                    <select id="enterPrioritySelect" class="dialog-select">
+                        <option value="">Sin prioridad</option>
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+                <div class="dialog-actions">
+                    <button id="enterCancelBtn" class="dialog-btn">Omitir</button>
+                    <button id="enterConfirmBtn" class="dialog-btn primary">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="note-renderer.js"></script>
+    <script>
+        // Inicializar Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
