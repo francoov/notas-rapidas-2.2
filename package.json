@@ -1,6 +1,6 @@
 {
   "name": "notas-rapidas",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Aplicación de notas rápidas tipo post-it para escritorio",
   "main": "main.js",
   "scripts": {

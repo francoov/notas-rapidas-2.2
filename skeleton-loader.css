@@ -1,0 +1,234 @@
+.app-skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.app-skeleton-card {
+    background: #2e2e2e;
+    border: 1px solid #3e3e3e;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.app-list-skeleton-item {
+    position: relative;
+    padding: 20px;
+    min-height: 90px;
+    border-bottom: 1px solid #3e3e3e;
+    background: #333333;
+}
+
+.app-list-skeleton-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #86d135;
+    pointer-events: none;
+}
+
+.app-list-skeleton-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.app-list-skeleton-title-group {
+    flex: 1;
+    min-width: 0;
+}
+
+.app-list-skeleton-date-left {
+    height: 16px;
+    width: 88px;
+    margin-bottom: 8px;
+}
+
+.app-list-skeleton-title {
+    height: 16px;
+    width: 68%;
+}
+
+.app-list-skeleton-date-right {
+    height: 14px;
+    width: 92px;
+    background: rgba(134, 209, 53, 0.22);
+}
+
+.app-list-skeleton-preview {
+    height: 13px;
+    margin-top: 6px;
+}
+
+.app-list-skeleton-preview-short {
+    width: 45%;
+}
+
+.app-list-skeleton-preview-medium {
+    width: 62%;
+}
+
+.app-list-skeleton-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+.app-list-skeleton-action {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+
+.app-metric-skeleton-item {
+    cursor: default;
+    pointer-events: none;
+    min-width: 64px;
+}
+
+.app-metric-skeleton-donut {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #434343;
+}
+
+.app-metric-skeleton-center {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-metric-skeleton-center-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #444444;
+}
+
+.app-metric-skeleton-name {
+    width: 56px;
+    height: 8px;
+    border-radius: 4px;
+    color: transparent;
+}
+
+.app-skeleton-board {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.app-skeleton-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.app-skeleton {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #3a3a3a;
+}
+
+.app-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: appSkeletonShimmer 1.2s ease-in-out infinite;
+}
+
+.app-skeleton-line {
+    height: 10px;
+    margin-bottom: 8px;
+}
+
+.app-skeleton-line:last-child {
+    margin-bottom: 0;
+}
+
+.app-skeleton-line-short {
+    width: 45%;
+}
+
+.app-skeleton-line-medium {
+    width: 65%;
+}
+
+.app-skeleton-line-long {
+    width: 90%;
+}
+
+.app-skeleton-meta {
+    height: 12px;
+    width: 30%;
+    margin-bottom: 12px;
+}
+
+.app-skeleton-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.app-skeleton-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+}
+
+.app-loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1200;
+}
+
+.app-loading-overlay.is-active {
+    display: flex;
+}
+
+.app-loading-card {
+    width: min(540px, 90%);
+    background: #2e2e2e;
+    border: 1px solid #3e3e3e;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes appSkeletonShimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}

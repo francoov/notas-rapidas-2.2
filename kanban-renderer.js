@@ -1,5 +1,10 @@
 const { ipcRenderer } = require('electron');
 require('./data-store');
+const {
+    createLoadingController,
+    createKanbanSkeleton,
+    createPersonMetricsSkeleton
+} = require('./skeleton-loader');
 
 let allBlocks = []; // Array de todos los bloques con sus notas
 let filteredBlocks = []; // Array de bloques filtrados según los filtros activos
@@ -19,6 +24,33 @@ const filters = {
     tagId: null,     // ID de la etiqueta (null = todas)
     daysFilter: null // Días para filtrar por fecha de creación (null = sin filtro)
 };
+const KANBAN_LOADER_LEAD_MS = 180;
+
+const kanbanLoadingController = createLoadingController({
+    onShow: () => {
+        const board = document.querySelector('.kanban-board');
+        if (board) board.setAttribute('aria-busy', 'true');
+
+        ['pendiente', 'en-progreso', 'hecho'].forEach(status => {
+            const column = document.getElementById(`column-${status}`);
+            if (column) {
+                column.innerHTML = createKanbanSkeleton(3);
+            }
+        });
+
+        const metrics = document.getElementById('personMetrics');
+        if (metrics) {
+            metrics.style.display = 'flex';
+            metrics.innerHTML = createPersonMetricsSkeleton(7);
+        }
+    },
+    onHide: () => {
+        const board = document.querySelector('.kanban-board');
+        if (board) board.removeAttribute('aria-busy');
+    },
+    delayMs: 0,
+    minVisibleMs: 420
+});
 
 // Generar iniciales de una persona
 function getPersonInitials(firstName, lastName) {
@@ -97,7 +129,21 @@ function applyFilters(blocks) {
 }
 
 // Cargar todas las notas y extraer bloques con estado
-function loadBlocks(forceRender = false) {
+function loadBlocks(forceRender = false, options = {}) {
+    const { showLoader = forceRender, __deferred = false } = options;
+
+    if (showLoader && !__deferred) {
+        const stopLoading = kanbanLoadingController.start();
+        setTimeout(() => {
+            try {
+                loadBlocks(forceRender, { showLoader: false, __deferred: true });
+            } finally {
+                Promise.resolve(stopLoading()).catch(() => {});
+            }
+        }, KANBAN_LOADER_LEAD_MS);
+        return;
+    }
+
     const savedNotes = localStorage.getItem('notes');
     if (!savedNotes) {
         allBlocks = [];
@@ -2494,7 +2540,7 @@ function updateToggleDoneColumnIcon(btn, isHidden) {
 }
 
 // Cargar bloques al iniciar
-loadBlocks();
+loadBlocks(true, { showLoader: true });
 
 
 // Configurar botones de ordenar y filtros después de cargar

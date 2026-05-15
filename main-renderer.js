@@ -1,5 +1,9 @@
 const { ipcRenderer } = require('electron');
 require('./data-store');
+const {
+    createLoadingController,
+    createListSkeleton
+} = require('./skeleton-loader');
 
 let notes = [];
 let filteredNotes = [];
@@ -8,24 +12,49 @@ let isRendering = false; // Flag para evitar renders simultáneos
 let updateIntervalId = null; // ID del intervalo para poder pausarlo
 let lastNotesHash = ''; // Hash del estado de notas para detectar cambios
 
+const notesListLoadingController = createLoadingController({
+    onShow: () => {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) return;
+        notesList.setAttribute('aria-busy', 'true');
+        notesList.innerHTML = createListSkeleton(4);
+    },
+    onHide: () => {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) return;
+        notesList.removeAttribute('aria-busy');
+    },
+    delayMs: 120,
+    minVisibleMs: 260
+});
+
 // Cargar notas del localStorage al iniciar
-async function loadNotes() {
-    const savedNotes = localStorage.getItem('notes');
-    if (savedNotes) {
-        notes = JSON.parse(savedNotes);
-    }
-    
-    // Filtrar notas cerradas del listado principal
-    const activeNotes = notes.filter(note => {
-        return !(note.status === 'closed' || note.isClosed);
-    });
-    
-    // Aplicar el filtro de búsqueda actual si existe
-    if (currentSearchQuery) {
-        await searchNotes(currentSearchQuery);
-    } else {
-        filteredNotes = [...activeNotes];
-        await renderNotes();
+async function loadNotes(options = {}) {
+    const { showLoader = false } = options;
+    const stopLoading = showLoader ? notesListLoadingController.start() : null;
+
+    try {
+        const savedNotes = localStorage.getItem('notes');
+        if (savedNotes) {
+            notes = JSON.parse(savedNotes);
+        }
+        
+        // Filtrar notas cerradas del listado principal
+        const activeNotes = notes.filter(note => {
+            return !(note.status === 'closed' || note.isClosed);
+        });
+        
+        // Aplicar el filtro de búsqueda actual si existe
+        if (currentSearchQuery) {
+            await searchNotes(currentSearchQuery, { showLoader: false });
+        } else {
+            filteredNotes = [...activeNotes];
+            await renderNotes();
+        }
+    } finally {
+        if (stopLoading) {
+            await stopLoading();
+        }
     }
 }
 
@@ -520,7 +549,7 @@ async function deleteNote(noteId) {
     saveNotes();
     ipcRenderer.send('delete-note', noteId);
     hideDeleteModal();
-    await loadNotes();
+    await loadNotes({ showLoader: true });
 }
 
 // Cerrar/abrir nota
@@ -540,12 +569,15 @@ async function toggleNoteClosed(noteId) {
         // NO actualizar updatedAt para mantener la posición en la lista
         saveNotes();
         ipcRenderer.send('note-updated', note);
-        await loadNotes();
+        await loadNotes({ showLoader: true });
     }
 }
 
 // Buscar notas
-async function searchNotes(query) {
+async function searchNotes(query, options = {}) {
+    const { showLoader = true } = options;
+    const stopLoading = showLoader ? notesListLoadingController.start() : null;
+
     const searchQuery = query ? query.trim() : '';
     currentSearchQuery = searchQuery; // Guardar la búsqueda actual
     
@@ -597,7 +629,13 @@ async function searchNotes(query) {
             return false;
         });
     }
-    await renderNotes();
+    try {
+        await renderNotes();
+    } finally {
+        if (stopLoading) {
+            await stopLoading();
+        }
+    }
 }
 
 // Event Listeners
@@ -696,7 +734,7 @@ async function importData() {
         localStorage.setItem('persons', JSON.stringify(Array.isArray(data.persons) ? data.persons : []));
         localStorage.setItem('tags', JSON.stringify(Array.isArray(data.tags) ? data.tags : []));
         ipcRenderer.send('data-imported');
-        await loadNotes();
+        await loadNotes({ showLoader: true });
         showMessage('Importar datos', 'Datos importados correctamente.');
     } catch (err) {
         showMessage('Error al importar', err.message);
@@ -735,14 +773,14 @@ function setupSearchInput() {
         
         newSearchInput.addEventListener('input', async (e) => {
             const query = e.target.value || '';
-            await searchNotes(query);
+            await searchNotes(query, { showLoader: true });
         });
         
         // También buscar al presionar Enter
         newSearchInput.addEventListener('keydown', async (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                await searchNotes(e.target.value || '');
+                await searchNotes(e.target.value || '', { showLoader: true });
             }
         });
     } else {
@@ -760,7 +798,7 @@ if (document.readyState === 'loading') {
 // Escuchar eventos del proceso principal
 ipcRenderer.on('note-created', async (event, noteId) => {
     // La nota se guardará desde la ventana de la nota
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 });
 
 ipcRenderer.on('note-updated', async (event, noteData) => {
@@ -799,7 +837,7 @@ ipcRenderer.on('note-updated', async (event, noteData) => {
         notes.push(noteData);
     }
     saveNotes();
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 });
 
 ipcRenderer.on('note-deleted', async (event, noteId) => {
@@ -812,11 +850,11 @@ ipcRenderer.on('note-deleted', async (event, noteId) => {
     // Limpiar cache del resumen para esta nota
     const cacheKeys = Array.from(summaryCache.keys()).filter(key => key.startsWith(String(noteId) + '_'));
     cacheKeys.forEach(key => summaryCache.delete(key));
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 });
 
 ipcRenderer.on('data-imported', async () => {
-    await loadNotes();
+    await loadNotes({ showLoader: true });
 });
 
 // Inicializar event listeners del modal
@@ -921,11 +959,11 @@ function setupEventDelegation() {
 // Cargar notas al iniciar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        loadNotes();
+        loadNotes({ showLoader: true });
         setupEventDelegation();
     });
 } else {
-    loadNotes();
+    loadNotes({ showLoader: true });
     setupEventDelegation();
 }
 
@@ -939,7 +977,7 @@ document.addEventListener('visibilitychange', () => {
             startUpdateInterval();
         }
         // Cargar notas inmediatamente al volver
-        loadNotes();
+        loadNotes({ showLoader: false });
     } else {
         // Pausar cuando va a segundo plano
         if (updateIntervalId) {
@@ -957,7 +995,7 @@ function startUpdateInterval() {
     updateIntervalId = setInterval(async () => {
         // Solo actualizar si la ventana está visible y no está renderizando
         if (isWindowVisible && !isRendering) {
-            await loadNotes();
+            await loadNotes({ showLoader: false });
         }
     }, 2000); // Aumentar a 2 segundos para reducir carga
 }
