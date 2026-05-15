@@ -1,7 +1,40 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
+const {
+    createLoadingController,
+    createListSkeleton
+} = require('./skeleton-loader');
 
 let persons = [];
 let tags = [];
+
+const settingsLoadingController = createLoadingController({
+    onShow: () => {
+        const personsList = document.getElementById('personsList');
+        const tagsList = document.getElementById('tagsList');
+        const versionLabel = document.getElementById('appVersionLabel');
+
+        if (personsList) {
+            personsList.setAttribute('aria-busy', 'true');
+            personsList.innerHTML = createListSkeleton(2);
+        }
+        if (tagsList) {
+            tagsList.setAttribute('aria-busy', 'true');
+            tagsList.innerHTML = createListSkeleton(2);
+        }
+        if (versionLabel) {
+            versionLabel.innerHTML = '<span class="app-skeleton app-skeleton-line app-skeleton-line-short"></span>';
+        }
+    },
+    onHide: () => {
+        const personsList = document.getElementById('personsList');
+        const tagsList = document.getElementById('tagsList');
+        if (personsList) personsList.removeAttribute('aria-busy');
+        if (tagsList) tagsList.removeAttribute('aria-busy');
+    },
+    delayMs: 80,
+    minVisibleMs: 180
+});
 
 // ========== MODAL ESTÁNDAR (confirmación / aviso) ==========
 function hideAppModal() {
@@ -603,6 +636,8 @@ function setupTabs() {
 
 // Cargar personas y etiquetas al iniciar
 window.addEventListener('DOMContentLoaded', async () => {
+    const stopLoading = settingsLoadingController.start();
+
     setupEventListeners();
     setupTabs();
     loadPersons();
@@ -617,6 +652,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch (_) {
         const verEl = document.getElementById('appVersionLabel');
         if (verEl) verEl.textContent = '';
+    } finally {
+        await stopLoading();
     }
 
     // Inicializar iconos de Lucide

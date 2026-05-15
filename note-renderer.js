@@ -1,4 +1,9 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
+const {
+    createLoadingController,
+    createInlineSkeleton
+} = require('./skeleton-loader');
 
 let noteId = null;
 let noteData = {
@@ -21,6 +26,58 @@ let selectedBlocks = new Set(); // Set de bloques seleccionados
 let saveNoteDebounceTimer = null;
 const SAVE_NOTE_DEBOUNCE_MS = 400;
 let lastPersistedSignature = '';
+
+function ensureNoteLoadingOverlay() {
+    const container = document.querySelector('.note-container');
+    if (!container) return null;
+
+    let overlay = document.getElementById('noteLoadingOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'noteLoadingOverlay';
+        overlay.className = 'app-loading-overlay';
+        overlay.innerHTML = `
+            <div class="app-loading-card">
+                ${createInlineSkeleton(3)}
+            </div>
+        `;
+        container.appendChild(overlay);
+    }
+
+    return overlay;
+}
+
+const noteLoadingController = createLoadingController({
+    onShow: () => {
+        const overlay = ensureNoteLoadingOverlay();
+        const noteContent = document.getElementById('noteContent');
+        if (noteContent) {
+            noteContent.setAttribute('aria-busy', 'true');
+        }
+        if (overlay) {
+            overlay.classList.add('is-active');
+        }
+    },
+    onHide: () => {
+        const overlay = ensureNoteLoadingOverlay();
+        const noteContent = document.getElementById('noteContent');
+        if (noteContent) {
+            noteContent.removeAttribute('aria-busy');
+        }
+        if (overlay) {
+            overlay.classList.remove('is-active');
+        }
+    },
+    delayMs: 80,
+    minVisibleMs: 220
+});
+
+function showBlockingNoteLoader() {
+    const overlay = ensureNoteLoadingOverlay();
+    if (overlay) {
+        overlay.classList.add('is-active');
+    }
+}
 
 function buildPersistedSignature(data) {
     return JSON.stringify({
@@ -2531,6 +2588,7 @@ if (redoBtn) {
 }
 
 document.getElementById('closeBtn').addEventListener('click', () => {
+    showBlockingNoteLoader();
     saveNote();
     ipcRenderer.send('close-note', noteId);
 });
@@ -2597,6 +2655,7 @@ document.getElementById('kanbanBtn').addEventListener('click', () => {
 // Cerrar nota
 document.getElementById('closeNoteBtn').addEventListener('click', async () => {
     closeNoteOptionsMenu();
+    showBlockingNoteLoader();
     
     // Guardar la nota antes de cerrar
     saveNote();
@@ -2652,6 +2711,7 @@ let isDeletingCurrentNote = false;
 async function deleteNote() {
     if (!pendingDeleteNoteId) return;
     
+    showBlockingNoteLoader();
     isDeletingCurrentNote = true;
     const noteIdToDelete = pendingDeleteNoteId;
     
@@ -3699,8 +3759,15 @@ window.addEventListener('blur', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    loadNote();
-    console.log('Nota cargada, noteId:', noteId);
+    const stopLoading = noteLoadingController.start();
+    setTimeout(async () => {
+        try {
+            loadNote();
+            console.log('Nota cargada, noteId:', noteId);
+        } finally {
+            await stopLoading();
+        }
+    }, 0);
 });
 
 // Guardar automáticamente cada 2 segundos

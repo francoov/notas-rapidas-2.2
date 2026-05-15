@@ -1,27 +1,57 @@
 const { ipcRenderer } = require('electron');
+require('./data-store');
+const {
+    createLoadingController,
+    createListSkeleton
+} = require('./skeleton-loader');
 
 let notes = [];
 let filteredNotes = [];
 let currentSearchQuery = '';
 
+const closedNotesLoadingController = createLoadingController({
+    onShow: () => {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) return;
+        notesList.setAttribute('aria-busy', 'true');
+        notesList.innerHTML = createListSkeleton(4);
+    },
+    onHide: () => {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) return;
+        notesList.removeAttribute('aria-busy');
+    },
+    delayMs: 120,
+    minVisibleMs: 260
+});
+
 // Cargar notas cerradas del localStorage al iniciar
-async function loadNotes() {
-    const savedNotes = localStorage.getItem('notes');
-    if (savedNotes) {
-        notes = JSON.parse(savedNotes);
-    }
-    
-    // Filtrar solo notas cerradas
-    const closedNotes = notes.filter(note => {
-        return note.status === 'closed' || note.isClosed;
-    });
-    
-    // Aplicar el filtro de búsqueda actual si existe
-    if (currentSearchQuery) {
-        await searchNotes(currentSearchQuery);
-    } else {
-        filteredNotes = [...closedNotes];
-        await renderNotes();
+async function loadNotes(options = {}) {
+    const { showLoader = false } = options;
+    const stopLoading = showLoader ? closedNotesLoadingController.start() : null;
+
+    try {
+        const savedNotes = localStorage.getItem('notes');
+        if (savedNotes) {
+            notes = JSON.parse(savedNotes);
+        }
+        
+        // Filtrar solo notas cerradas
+        const closedNotes = notes.filter(note => {
+            return note.status === 'closed' || note.isClosed;
+        });
+        
+        // Aplicar el filtro de búsqueda actual si existe
+        if (currentSearchQuery) {
+            await searchNotes(currentSearchQuery, { showLoader: false });
+        } else {
+            filteredNotes = [...closedNotes];
+            await renderNotes();
+        }
+    } finally {
+        if (stopLoading) {
+            await stopLoading();
+        }
     }
 }
 
@@ -309,7 +339,7 @@ async function deleteNote(noteId) {
     saveNotes();
     ipcRenderer.send('delete-note', noteId);
     hideDeleteModal();
-    await loadNotes();
+    await loadNotes({ showLoader: true });
 }
 
 async function toggleNoteClosed(noteId) {
@@ -319,12 +349,15 @@ async function toggleNoteClosed(noteId) {
         note.isClosed = false;
         saveNotes();
         ipcRenderer.send('note-updated', note);
-        await loadNotes();
+        await loadNotes({ showLoader: true });
     }
 }
 
 // Buscar notas
-async function searchNotes(query) {
+async function searchNotes(query, options = {}) {
+    const { showLoader = true } = options;
+    const stopLoading = showLoader ? closedNotesLoadingController.start() : null;
+
     const searchQuery = query ? query.trim() : '';
     currentSearchQuery = searchQuery;
     
@@ -371,7 +404,13 @@ async function searchNotes(query) {
             return false;
         });
     }
-    await renderNotes();
+    try {
+        await renderNotes();
+    } finally {
+        if (stopLoading) {
+            await stopLoading();
+        }
+    }
 }
 
 // Event Listeners
@@ -387,13 +426,13 @@ function setupSearchInput() {
         
         newSearchInput.addEventListener('input', async (e) => {
             const query = e.target.value || '';
-            await searchNotes(query);
+            await searchNotes(query, { showLoader: true });
         });
         
         newSearchInput.addEventListener('keydown', async (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                await searchNotes(e.target.value || '');
+                await searchNotes(e.target.value || '', { showLoader: true });
             }
         });
     }
@@ -407,17 +446,17 @@ if (document.readyState === 'loading') {
 
 // Escuchar eventos del proceso principal
 ipcRenderer.on('note-updated', async (event, noteData) => {
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 });
 
 ipcRenderer.on('note-deleted', async (event, noteId) => {
     notes = notes.filter(note => note.id !== noteId);
     saveNotes();
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 });
 
 ipcRenderer.on('data-imported', async () => {
-    await loadNotes();
+    await loadNotes({ showLoader: true });
 });
 
 // Inicializar event listeners del modal
@@ -464,14 +503,14 @@ if (document.readyState === 'loading') {
 // Cargar notas al iniciar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        loadNotes();
+        loadNotes({ showLoader: true });
     });
 } else {
-    loadNotes();
+    loadNotes({ showLoader: true });
 }
 
 // Actualizar lista periódicamente
 setInterval(async () => {
-    await loadNotes();
+    await loadNotes({ showLoader: false });
 }, 1000);
 

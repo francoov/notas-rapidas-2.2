@@ -1,6 +1,6 @@
 {
   "name": "notas-rapidas",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Aplicación de notas rápidas tipo post-it para escritorio",
   "main": "main.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
     "cross-env": "^10.1.0",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
@@ -40,5 +41,8 @@
       "oneClick": false,
       "icon": "assets/icon.ico"
     }
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0"
   }
 }
